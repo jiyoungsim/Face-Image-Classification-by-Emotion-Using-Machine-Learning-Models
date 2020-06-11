@@ -1,0 +1,307 @@
+---
+title: "XgBoost"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+require(dplyr)
+require(ggplot2)
+require(glue)
+require(caret)
+require(xgboost)
+require(data.table)
+require(vcd)
+require(e1071)
+require(ModelMetrics)
+require(OpenMPController) # for Kaggle backend
+require(readr)
+require(vtreat)
+
+
+set.seed(0)
+omp_set_num_threads(4) # caret parallel processing threads
+
+```
+
+### Boolean
+```{r}
+run.pca<-FALSE
+run.HOG<-FALSE
+run.myfeature1<-FALSE
+run.myfeature2<-TRUE
+run.original<-FALSE
+
+```
+
+### 1. Using extractedpca
+```{r}
+
+if(run.pca){
+# Load dataset in memory.
+load("../output/extractedpca.RData")
+
+  # split the test, train dataset
+train_idx <- sample(1:2500, 2000)
+train_xgb <- data.frame(pca_thre)[train_idx,]
+
+test_idx <- setdiff(1:2500, train_idx)
+test_xgb<- data.frame(pca_thre)[test_idx,]
+
+# rename the label column
+names(train_xgb)[31] <- "label"
+names(test_xgb)[31] <- "label"
+# factorize label column
+train_xgb$label <- factor(train_xgb$label)
+test_xgb$label <- factor(test_xgb$label)
+
+
+# Here we use 10-fold cross-validation, repeating twice, and using random search for tuning hyper-parameters.
+fitControl <- trainControl(method = "repeatedcv", number = 10, repeats =2,  search = "random", allowParallel = TRUE)
+
+# train a xgbTree model using caret::train
+train_xgb_dat<-train_xgb[,1:30]
+
+
+xgb_model <- caret::train(
+  x = train_xgb_dat,
+  y = train_xgb$label,
+  trControl = fitControl,
+  method = "xgbLinear",
+  verbose = TRUE
+)
+
+print(xgb_model$results) # Model results
+
+
+
+# Prediction
+#y_pred_xgb <- predict(xgb_model, test_xgb)
+
+
+# calculate accuracy
+accu_xgb <- max(xgb_model$results$Accuracy)*100
+cat("The accuracy of model on selected feature:", "is", round(accu_xgb,2), "%.\n")
+
+# caret::confusionMatrix(y_pred_xgb, test_xgb$label)
+}
+```
+
+
+## 2. Using HOG
+### Load the data and split test train dataset
+```{r}
+if(run.HOG){
+load("../output/HOG.RData")
+
+train_idx <- sample(1:2500, 2000)
+train_xgb <- data.frame(dat)[train_idx,]
+
+test_idx <- setdiff(1:2500, train_idx)
+test_xgb<- data.frame(dat)[test_idx,]
+
+# rename the label column
+names(train_xgb)[55] <- "label"
+names(test_xgb)[55] <- "label"
+  
+# factorize label column
+train_xgb$label <- factor(train_xgb$label)
+test_xgb$label <- factor(test_xgb$label)
+
+# Set up control parameters for caret::train
+# Here we use 10-fold cross-validation, repeating twice, and using random search for tuning hyper-parameters.
+fitControl <- trainControl(method = "repeatedcv", number = 10, repeats = 2, search = "random", allowParallel = TRUE)
+
+# train a xgbTree model using caret::train
+train_hog_dat<-train_xgb[,1:54]
+
+
+hog_model <- caret::train(
+  x = train_hog_dat,
+  y = train_xgb$label,
+  trControl = fitControl,
+  method = "xgbLinear",
+  verbose = TRUE
+)
+
+
+print(hog_model$results) # Model results
+
+# Prediction
+y_pred_hog <- predict(hog_model, test_xgb)
+
+# Accuracy
+accu_hog <- max(hog_model$results$Accuracy)*100
+
+cat("The accuracy of model on selected feature:", "is", round(accu_hog,2), "%.\n")
+
+# caret::confusionMatrix(y_pred_hog, test_xgb$label)
+}
+```
+
+## 3. Using myfeature1
+### Load the data and split test train dataset
+
+```{r}
+if(run.myfeature1){
+load("../output/myfeature1.RData")
+
+# split the test, train dataset
+train_idx <- sample(1:2500, 2000)
+train_xgb <- data.frame(mydat)[train_idx,]
+
+test_idx <- setdiff(1:2500, train_idx)
+test_xgb<- data.frame(mydat)[test_idx,]
+n<-ncol(train_xgb)
+
+# rename the label column
+names(train_xgb)[ncol(train_xgb)] <- "label"
+names(test_xgb)[ncol(train_xgb)] <- "label"
+
+# factorize label column
+train_xgb$label <- factor(train_xgb$label)
+test_xgb$label <- factor(test_xgb$label)
+
+
+# Set up control parameters for caret::train
+fitControl <- trainControl(method = "repeatedcv", number = 10, repeats = 2, search = "random", allowParallel = TRUE)
+
+# train a xgbTree model using caret::train
+train_f1_dat<-train_xgb[,1:n-1]
+
+f1_model <- caret::train(
+  x = train_f1_dat,
+  y = train_xgb$label,
+  trControl = fitControl,
+  method = "xgbLinear",
+  verbose = TRUE
+)
+
+print(f1_model$results) # Model results
+
+# Prediction
+y_pred_f1 <- predict(f1_model, test_xgb)
+
+
+# calculate accuracy
+accu_f1<- mean(test_xgb$label == y_pred_f1)
+cat("The accuracy of model on selected feature:", "is", accu_f1*100, "%.\n")
+
+#caret::confusionMatrix(y_pred_f1, test_xgb$label)
+}
+```
+
+## 4. Using myfeature2
+```{r}
+if(run.myfeature2){
+# Load dataset in memory.
+
+load("../output/myfeature2.RData")
+
+
+# split the test, train dataset
+train_idx <- sample(1:2500, 2000)
+train_xgb <- data.frame(datcomb)[train_idx,]
+
+
+test_idx <- setdiff(1:2500, train_idx)
+test_xgb<- data.frame(datcomb)[test_idx,]
+n<-ncol(train_xgb)
+
+# rename the label column
+names(train_xgb)[ncol(train_xgb)] <- "label"
+names(test_xgb)[ncol(train_xgb)] <- "label"
+# factorize label column
+train_xgb$label <- factor(train_xgb$label)
+test_xgb$label <- factor(test_xgb$label)
+
+
+# Here we use 10-fold cross-validation, repeating twice, and using random search for tuning hyper-parameters.
+fitControl <- trainControl(method = "repeatedcv", number = 10, repeats = 2, search = "random", allowParallel = TRUE)
+
+# train a xgbTree model using caret::train
+train_xgb_dat<-train_xgb[,1:n-1]
+
+
+modelmyfeature2 <- caret::train(
+  x = train_xgb_dat,
+  y = train_xgb$label,
+  trControl = fitControl,
+  method = "xgbLinear",
+  verbose = TRUE
+)
+
+print(modelmyfeature2$results) # Model results
+
+
+
+# Prediction
+#y_pred_myfeature2 <- predict(modelmyfeature2, test_xgb)
+
+# calculate accuracy
+accu_myfeature2 <- max(modelmyfeature2$results$Accuracy)*100
+
+cat("The accuracy of model on selected feature:", "is", round(accu_myfeature2,2), "%.\n")
+
+#caret::confusionMatrix(y_pred_xgb, test_xgb$label)
+}
+
+```
+
+## 5. Using original features
+```{r}
+if(run.original){
+# Load dataset in memory.
+
+load("../output/feature_train.RData")
+train_xgb <- data.frame(dat_train)
+  
+load("../output/feature_test.RData")
+test_xgb <- data.frame(dat_test)
+
+
+
+n<-ncol(train_xgb)
+
+# rename the label column
+names(train_xgb)[ncol(train_xgb)] <- "label"
+names(test_xgb)[ncol(train_xgb)] <- "label"
+# factorize label column
+train_xgb$label <- factor(train_xgb$label)
+test_xgb$label <- factor(test_xgb$label)
+
+
+# Here we use 10-fold cross-validation, repeating twice, and using random search for tuning hyper-parameters.
+fitControl <- trainControl(method = "repeatedcv", number = 10, repeats = 2, search = "random", allowParallel = TRUE)
+
+# train a xgbTree model using caret::train
+train_orig_dat<-train_xgb[,1:n-1]
+
+
+modeloriginal <- caret::train(
+  x = train_orig_dat,
+  y = train_xgb$label,
+  trControl = fitControl,
+  method = "xgbLinear",
+  verbose = TRUE
+)
+
+print(modeloriginal$results) # Model results
+
+
+
+# Prediction
+#y_pred_original <- predict(modeloriginal, test_xgb)
+
+# calculate accuracy
+accu_original <- max(modeloriginal$results$Accuracy)*100
+
+cat("The accuracy of model on selected feature:", "is", round(accu_original,2), "%.\n")
+
+}
+```
+

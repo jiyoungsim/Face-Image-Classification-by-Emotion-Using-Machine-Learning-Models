@@ -1,0 +1,259 @@
+---
+title: "Linear_SVM_soft_margin"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Using extractedpca
+### Load the data and split test train dataset
+
+```{r}
+load("./output/extractedpca.RData")
+
+# split the test, train dataset
+train_idx <- sample(1:2500, 2000)
+train_pca <- data.frame(pca_thre)[train_idx,]
+test_idx <- setdiff(1:2500, train_idx)
+test_pca<- data.frame(pca_thre)[test_idx,]
+
+# rename the label column
+names(train_pca)[31] <- "y"
+names(test_pca)[31] <- "y"
+
+# factorize label column
+train_pca$y <- factor(train_pca$y)
+test_pca$y <- factor(test_pca$y)
+
+# rescale the data due to large variation
+scale_num <- max(train_pca[,1:ncol(train_pca)-1])
+
+train_pca[,1:30] <- train_pca[,1:30]/scale_num
+test_pca[,1:30] <- test_pca[,1:30]/scale_num
+
+```
+
+### Tune the parameter C and sigma
+
+```{r, eval=FALSE}
+# use cv to choose the optimal C
+source("../lib/cross_val_lin_svm.R")
+
+## set the C list
+C = c(0.001, 0.1 ,1 ,10 ,100)
+err_cv_pca <- matrix(0, nrow = length(C))
+for(i in 1:length(C)){
+  cat("C=", C[i], "\n")
+  err_cv_pca[i,] <- cv_svm_lin.function(dat_train = train_pca, K=5, C[i])
+}
+```
+
+### Train the model
+
+```{r}
+# choose the best perfomed parameter
+para_best_pca <- C[which.min(err_cv_pca)]
+
+# use the whole train data to retrain the model using selected parameter
+model_best_pca <- kernlab::ksvm(y ~ ., data = train_pca, scaled = FALSE,
+                               kernal = "vanilladot", 
+                               C = para_best_pca)
+print(model_best_pca)
+```
+
+### Evaluate model on test dataset
+
+```{r}
+# prediction
+pred_pca <- predict(model_best_pca, newdata = test_pca, type = "response")
+
+# calculate accuracy
+accu_pca <- mean(test_pca$y == pred_pca)
+cat("The accuracy of model on PCA feature:", "is", accu_pca*100, "%.\n")
+
+caret::confusionMatrix(pred_pca, test_pca$y)
+```
+
+
+## 2. Using HOG
+### Load the data and split test train dataset
+
+```{r}
+load("./output/HOG.RData")
+
+# split the test, train dataset
+train_hog <- data.frame(dat)[train_idx,]
+test_hog<- data.frame(dat)[test_idx,]
+
+# rename the label column
+names(train_hog)[55] <- "y"
+names(test_hog)[55] <- "y"
+
+# factorize label column
+train_hog$y <- factor(train_hog$y)
+test_hog$y <- factor(test_hog$y)
+
+
+```
+
+### Tune the parameter C and sigma
+
+```{r, eval=FALSE}
+# use cv to choose the optimal C
+err_cv_hog <- matrix(0, nrow = length(C))
+for(i in 1:length(C)){
+  cat("C=", C[i], "\n")
+  err_cv_hog[i,] <- cv_svm_lin.function(dat_train = train_hog, K=5, C[i])
+}
+```
+
+### Train the model
+
+```{r}
+# choose the best perfomed parameter
+para_best_hog <- C[which.min(err_cv_hog)]
+
+# use the whole train data to retrain the model using selected parameter
+model_best_hog <- kernlab::ksvm(y ~ ., data = train_hog, scaled = FALSE,
+                               kernal = "vanilladot", 
+                               C = para_best_hog)
+print(model_best_hog)
+```
+
+### Evaluate model on test dataset
+
+```{r}
+# prediction
+pred_hog <- predict(model_best_hog, newdata = test_hog, type = "response")
+
+# calculate accuracy
+accu_hog <- mean(test_hog$y == pred_hog)
+cat("The accuracy of model on HOG feature:", "is", accu_hog*100, "%.\n")
+
+caret::confusionMatrix(pred_hog, test_hog$y)
+```
+
+
+## 3. Using myfeature1
+### Load the data and split test train dataset
+
+```{r}
+load("./output/myfeature1.RData")
+
+# split the test, train dataset
+train_f1 <- data.frame(mydat)[train_idx,]
+test_f1<- data.frame(mydat)[test_idx,]
+
+# rename the label column
+names(train_f1)[507] <- "y"
+names(test_f1)[507] <- "y"
+
+# factorize label column
+train_f1$y <- factor(train_f1$y)
+test_f1$y <- factor(test_f1$y)
+
+
+```
+
+### Tune the parameter C and sigma
+
+```{r, eval=FALSE}
+# use cv to choose the optimal C
+err_cv_f1 <- matrix(0, nrow = length(C))
+for(i in 1:length(C)){
+  cat("C=", C[i], "\n")
+  err_cv_f1[i,] <- cv_svm_lin.function(dat_train = train_f1, K=5, C[i])
+}
+
+
+```
+
+### Train the model
+
+```{r}
+# choose the best perfomed parameter
+para_best_f1 <- C[which.min(err_cv_f1)]
+
+# use the whole train data to retrain the model using selected parameter
+model_best_f1 <- kernlab::ksvm(y ~ ., data = train_f1, scaled = FALSE,
+                               kernal = "vanilladot", 
+                               C = para_best_f1)
+print(model_best_f1)
+```
+
+### Evaluate model on test dataset
+
+```{r}
+# prediction
+pred_f1 <- predict(model_best_f1, newdata = test_f1, type = "response")
+
+# calculate accuracy
+accu_f1 <- mean(test_f1$y == pred_f1)
+cat("The accuracy of model on selected feature:", "is", accu_f1*100, "%.\n")
+
+caret::confusionMatrix(pred_f1, test_f1$y)
+```
+
+## 4. Using myfeature2
+### Load the data and split test train dataset
+
+```{r}
+load("../output/myfeature2.RData")
+
+# split the test, train dataset
+train_f2 <- data.frame(datcomb)[train_idx,]
+test_f2<- data.frame(datcomb)[test_idx,]
+
+# rename the label column
+names(train_f2)[99] <- "y"
+names(test_f2)[99] <- "y"
+
+# factorize label column
+train_f2$y <- factor(train_f2$y)
+test_f2$y <- factor(test_f2$y)
+
+```
+
+### Tune the parameter C and sigma
+
+```{r, eval=FALSE}
+# use cv to choose the optimal C
+err_cv_f2 <- matrix(0, nrow = length(C))
+for(i in 1:length(C)){
+  cat("C=", C[i], "\n")
+  err_cv_f2[i,] <- cv_svm_lin.function(dat_train = train_f2, K=5, C[i])
+}
+
+
+```
+
+### Train the model
+
+```{r}
+# choose the best perfomed parameter
+para_best_f2 <- C[which.min(err_cv_f2)]
+
+# use the whole train data to retrain the model using selected parameter
+model_best_f2 <- kernlab::ksvm(y ~ ., data = train_f2, scaled = FALSE,
+                               kernal = "vanilladot", 
+                               C = para_best_f2)
+print(model_best_f2)
+```
+
+### Evaluate model on test dataset
+
+```{r}
+# prediction
+pred_f2 <- predict(model_best_f2, newdata = test_f2, type = "response")
+
+# calculate accuracy
+accu_f2 <- mean(test_f2$y == pred_f2)
+cat("The accuracy of model on selected feature:", "is", accu_f2*100, "%.\n")
+
+caret::confusionMatrix(pred_f2, test_f2$y)
+```
+
+
+
