@@ -52,11 +52,11 @@ Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by
 
 ```
 proj/
-├── lib/
-├── data/
-├── doc/
-├── figs/
-└── output/
+├── lib/ various files with function definitions and code. Some files are needed to run final deliverable report in doc folder.
+├── data/ data used in the analysis. 
+├── doc/ report, presentation files, and final deliverables.
+├── figs/ figures.
+└── output/ analysis output, processed datasets, logs, or other processed things.
 ```
 
 Please see each subfolder for a README file.
