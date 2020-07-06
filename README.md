@@ -7,7 +7,7 @@
 	+ Thomson Batidzirai
 	+ Mo Yang
 	
-+ **Objective**: The goal of this project is to build a classification model for facial images by emotions that performs better than the baseline boosted decision stump. The models are evaluated in terms of accuracy and computational expenses, with assumption that the model will be retrained on a larger dataset in the future.
++ **Objective**: The goal of this project is to build a classification model for facial images by emotions that performs better than the baseline boosted decision stump. The models are evaluated in terms of accuracy and computational expenses, with the assumption that the model will be retrained on a larger dataset in the future.
 
 + **Project summary**: 
 	
@@ -17,7 +17,7 @@
 	
 	<img src="/figs/baseline.png" width="600">
 	
-	First, we extracted new features and train/tested models using different features, including the original features, PCA extracted features, RGB , and distances between chosen fiducial points (MyFeature1 and MyFeature2). Then, we built and tested models such as baseline boosted decision stump, XGBoost, linear SVM, Random Forest, LGBM, Logistic Regression, CNN, etc. 
+	First, we extracted new features and train/tested models using different features, including the original features, PCA extracted features, RGB , and distances between chosen fiducial points (MyFeature1 and MyFeature2). Then, we built and tested models such as baseline boosted decision stump, XGBoost, linear SVM, Random Forest, LGBM, Logistic Regression, CNN, etc. For seamless collaboration and To use both Python and R interactively during the task for seamless collaboration, rpy2 module was used.
 	
 	<img src="/figs/features.png" width="600">
 	
