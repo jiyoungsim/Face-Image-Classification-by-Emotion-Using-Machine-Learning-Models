@@ -1,62 +1,67 @@
-# Project: Can you recognize the emotion from an image of a face? 
-![image](figs/mona.jpeg)
+# Face Image Classification by Emotion Using Machine Learning Models (Project Lead)
 
-### [Full Project Description](doc/project3_desc.md)
++ **Team members**
+	+ Project Lead: Young Sim
+	+ Feichi Gu
+	+ Chang Qu
+	+ Thomson Batidzirai
+	+ Mo Yang
+	
++**Objective**: The goal of this project is to build a classification model for facial images by emotions that performs better than the baseline boosted decision stump. The models are evaluated in terms of accuracy and computational expenses, with assumption that the model will be retrained on a larger dataset in the future.
 
-Term: Fall 2019
++ **Project summary**: 
+	
+	In this project, we created a classification engine for facial emotion recognition using Python and R interactively. The baseline features provided for the model were fiducial points. 
+	
+	<img src="/figs/fiducial_points.jpg" width="500">
+	
+	<img src="/figs/baseline.png" width="500">
+	
+	First, we extracted new features and train/tested models using different features, including the original features, PCA extracted features, RGB , and distances between chosen fiducial points (MyFeature1 and MyFeature2). Then, we built and tested models such as baseline boosted decision stump, XGBoost, linear SVM, Random Forest, LGBM, Logistic Regression, CNN, etc. 
+	
+	<img src="/figs/features.png" width="500">
+	
+	<img src="/figs/accuracy.png" width="500">
+	
+	By comparing the accuracy and the computational time between feature-model combinations, we got our final model, which is a soft voting classifier combining LGBM (dart), Random Forest, Logistic Regression, and linear SVM. The final model improved accuracy by 6.3% while reducing training time by 82.7% compared to the baseline model.
+	
+	<img src="/figs/results.png" width="500">
 
-+ Team 1
-+ Team members
-	+ 1 Thomson Batidzirai
-	+ 2 Feichi Gu
-	+ 3 Chang Qu
-	+ 4 Young Sim
-	+ 5 Mo Yang
 	
++**Contribution statement**: 
+	+ Young Sim (Project Lead)
+		+ Build and train/test baseline boosted decision stump model in Python
+		+ Build and train/test voting classifier model in Python (final model selected)
+		+ Write main.ipynb (final deliverable)
+		+ Write scripts for feature extraction and training/testing for CNN in Python
 
-+ Project summary: 
-In this project, we created a classification engine for facial emotion recognition using Python and R. Firstly, we identified the necessary features including, the original features, extract HOG, PCA, and RGB (we don't use this one in the end) features, and Choose 23 points (MyFeature1) and 5 groups of points (MyFeatures2) to calculate the distance between them. Then, we built and tested models such as boosted decision stump(baseline model), XGBoost, linear SVM, Random Forest, LGBM, Logistic Regression, CNN, etc. By comparing the accuracy and the computational time between each combination, we got our final model, which is a soft voting classifier combining LGBM (dart), Random Forest, Logistic Regression, and linear SVM.
+	+ Thomson Batidzirai  
+	    + Train and test XGboosting model based on PCA, HOG, RGB and Features we choose by ourselves in R
+	    + Make the PPT and give the presentation
 
-	
-**Contribution statement**: 
-+ Young Sim (Project Leader)
-               
-	+ Build and train/test baseline boosted decision stump model in Python
-	+ Build and train/test voting classifier model in Python
-	+ Write main.ipynb
-	+ Write scripts for feature extraction and training/testing for CNN in Python
-	
-+ Thomson Batidzirai  
-        
-    + Train and test XGboosting model based on PCA, HOG, RGB and Features we choose by ourselves in R
-    + Make the PPT and give the presentation
-	
-+ Feichi Gu
-   
-	+ Data processing: include data splitting and cleaning 
-	+ Build the HOG and PCA function and Extract HOG and PCA features (pick the best parameter of HOG and PCA) in R
-	+ Choose 23 points and 5 groups of points to calculate the distance between them, and build our dataset1 and dataset2
-	
-+ Mo Yang          
-                
-	+ Conduct image exploration before extracting new features and Review those previous researches in this area.
-	+ Build the RGB function and Extract RGB features in R
-	+ Generate README.Rmd 
-	
-	
-+ Chang Qu  
-  + Train and test SVM (linear) and random froest model based on PCA, HOG, and the features we choose by ourselves (pick the best parameter of SVM model, test using cross validation) in R
+	+ Feichi Gu
+		+ Data processing: include data splitting and cleaning 
+		+ Feature extraction in R: HOG, PCA, fiducial points distances (MyFeature1 and MyFeature2)
+		+ MyFeature2 is used for the final model
 
+	+ Mo Yang          
+		+ Conduct image exploration before extracting new features and Review those previous researches in this area.
+		+ Feature extraction in R: RGB
+
+	+ Chang Qu  
+	  + Train and test SVM (linear) and random froest model based on PCA, HOG, and the features we choose by ourselves (pick the best parameter of SVM model, test using cross validation) in R
+
++ **Keywords: Machine Learning, Image Processing, Classification, Voting Classifier, Support Vector Machine, Random Forest, Gradient Boosting, Logistic Regression, Python**
 
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
 
 ```
 proj/
-├── lib/ various files with function definitions and code. Some files are needed to run final deliverable report in doc folder.
 ├── data/ data used in the analysis. 
 ├── doc/ report, presentation files, and final deliverables.
 ├── figs/ figures.
-└── output/ analysis output, processed datasets, logs, or other processed things.
+├── lib/ various files with function definitions and code. Some of the files here are needed to run final deliverable report in doc folder.
+└── output/ processed data (extracted features).
 ```
 
 Please see each subfolder for a README file.
