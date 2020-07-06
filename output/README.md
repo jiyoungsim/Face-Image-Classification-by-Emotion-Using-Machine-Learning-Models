@@ -1,6 +1,6 @@
-# Project: Can you recognize the emotion from an image of a face?
+# Face Image Classification by Emotion Using Machine Learning Models (Project Lead)
 
 ### Output folder
 
-The output directory contains analysis output, processed datasets, logs, or other processed things.
+The output directory contains processed data (extracted features).
 
