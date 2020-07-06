@@ -28,7 +28,7 @@
 	<img src="/figs/results.png" width="600">
 
 	
-+**Contribution statement**: 
++ **Contribution statement**: 
 	+ Young Sim (Project Lead)
 		+ Build and train/test baseline boosted decision stump model in Python
 		+ Build and train/test voting classifier model in Python (final model selected)
