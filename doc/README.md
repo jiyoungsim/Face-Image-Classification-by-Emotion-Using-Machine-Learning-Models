@@ -1,4 +1,4 @@
-# Project: Can you recognize the emotion from an image of a face?
+# Face Image Classification by Emotion Using Machine Learning Models (Project Lead)
 
 ### Doc folder
 
