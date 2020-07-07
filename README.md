@@ -13,7 +13,7 @@
 
 + **Project summary**: 
 	
-	In this project, we created a classification engine for facial emotion recognition using Python and R interactively. See project notebook for more details.
+	In this project, we created a classification engine for facial emotion recognition using Python and R interactively. See project notebooks/slides for more details.
 	
 	The baseline features provided for the model were fiducial points. 
 	
