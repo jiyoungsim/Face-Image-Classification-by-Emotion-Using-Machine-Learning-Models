@@ -7,11 +7,15 @@
 	+ Thomson Batidzirai
 	+ Mo Yang
 	
++ **Keywords: Machine Learning, Image Processing, Classification, Voting Classifier, Support Vector Machine, Random Forest, Gradient Boosting, Logistic Regression, Python**
+	
 + **Objective**: The goal of this project is to build a classification model for facial images by emotions that performs better than the baseline boosted decision stump. The models are evaluated in terms of accuracy and computational expenses, with the assumption that the model will be retrained on a larger dataset in the future.
 
 + **Project summary**: 
 	
-	In this project, we created a classification engine for facial emotion recognition using Python and R interactively. The baseline features provided for the model were fiducial points. 
+	In this project, we created a classification engine for facial emotion recognition using Python and R interactively. See project notebook for more details.
+	
+	The baseline features provided for the model were fiducial points. 
 	
 	<img src="/figs/fiducial_points.jpg" width="500">
 	
